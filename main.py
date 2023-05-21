@@ -1,3 +1,6 @@
+#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  All rights reserved
+
 from __future__ import print_function
 import time
 
@@ -385,7 +388,7 @@ class Processor():
             s = f'[ {localtime} ] {s}'
         print(s)
         if self.arg.print_log:
-            with open(os.path.join(self.arg.work_dir, 'log.txt'), 'a') as f:
+            with open(os.path.join(self.arg.work_dir, 'log.txt'), 'a', encoding='utf-8') as f:
                 print(s, file=f)
 
     def record_time(self):
@@ -934,6 +937,7 @@ class Processor():
             send_email(['zhenyue.qin@anu.edu.au'], 'exp_end', email_msg)
 
         elif self.arg.phase == 'test':
+            self.arg.test_feeder_args['debug'] = False
             if not self.arg.test_feeder_args['debug']:
                 wf = os.path.join(self.arg.work_dir, 'wrong-samples.txt')
                 rf = os.path.join(self.arg.work_dir, 'right-samples.txt')
@@ -982,7 +986,7 @@ def main():
     p.num_worker = p.num_worker * 2
 
     if p.config is not None:
-        with open(p.config, 'r') as f:
+        with open(p.config, 'r', encoding='utf-8') as f:
             default_arg = yaml.safe_load(f)
         key = vars(p).keys()
         for k in default_arg.keys():

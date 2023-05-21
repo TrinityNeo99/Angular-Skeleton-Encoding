@@ -1,9 +1,12 @@
+#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  All rights reserved
+
 import json
 from collections import defaultdict
 
 from sklearn.metrics import confusion_matrix
 
-from metadata.class_labels import ntu120_code_labels, anu_bullying_pair_labels, bly_labels, anubis_ind_actions
+from class_labels import ntu120_code_labels, anu_bullying_pair_labels, bly_labels, anubis_ind_actions
 # from test_fields.kinetics_analysis import get_kinetics_dict
 import numpy as np
 
