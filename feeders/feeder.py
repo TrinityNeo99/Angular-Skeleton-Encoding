@@ -1,4 +1,8 @@
+#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  All rights reserved
+
 import sys
+
 sys.path.extend(['../'])
 
 import torch
@@ -67,7 +71,7 @@ class Feeder(Dataset):
     def load_data(self):
         # data: N C T V M
         try:
-            with open(self.label_path) as f:
+            with open(self.label_path, 'rb') as f:
                 self.sample_name, self.label = pickle.load(f)
         except:
             # for pickle file from python2
@@ -320,6 +324,7 @@ def test(data_path, label_path, vid=None, graph=None, is_3d=False):
 
 if __name__ == '__main__':
     import os
+
     os.environ['DISPLAY'] = 'localhost:10.0'
     data_path = "../data/ntu/xview/val_data_joint.npy"
     label_path = "../data/ntu/xview/val_label.pkl"

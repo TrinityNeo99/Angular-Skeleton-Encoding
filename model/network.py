@@ -6,6 +6,7 @@ import sys
 
 from model.att_gcn import Att_GraphConv
 from model.hyper_gcn import Hyper_GraphConv
+
 # from model.transformers import get_pretrained_transformer
 
 sys.path.insert(0, '')
@@ -111,6 +112,7 @@ class MultiWindow_MS_G3D(nn.Module):
         # no activation
         return out_sum
 
+
 ntu_bone_angle_pairs = {
     25: (24, 12),
     24: (25, 12),
@@ -167,27 +169,27 @@ ntu_bone_adj = {
     16: 15
 }
 
-pingpong_coco_bone_angle_pairs ={
-    3: (1,0),
-    1: (0,3),
-    4: (2,0),
-    2: (0,4),
-    0: (5,6),
-    6: (8,5),
-    5: (7,6),
-    7: (9,5),
-    8: (6,10),
-    10: (10,10),
-    11: (5,13),
-    12: (6,14),
-    13: (11,15),
-    15: (15,15),
-    14: (12,16),
-    16: (16,16),
+pingpong_coco_bone_angle_pairs = {
+    3: (1, 0),
+    1: (0, 3),
+    4: (2, 0),
+    2: (0, 4),
+    0: (5, 6),
+    6: (8, 5),
+    5: (7, 6),
+    7: (9, 5),
+    8: (6, 10),
+    10: (10, 10),
+    11: (5, 13),
+    12: (6, 14),
+    13: (11, 15),
+    15: (15, 15),
+    14: (12, 16),
+    16: (16, 16),
     9: (9, 9)
 }
 
-pingpong_coco_bone_adj ={
+pingpong_coco_bone_adj = {
     3: 1,
     1: 0,
     4: 2,
@@ -208,6 +210,7 @@ pingpong_coco_bone_adj ={
     # 5: 6,
     # 11: 12,
 }
+
 
 class Model(nn.Module):
     def __init__(self,
@@ -259,6 +262,7 @@ class Model(nn.Module):
         self.sgcn1_msgcn = MS_GCN(num_gcn_scales, in_channels, c1, A_binary, disentangled_agg=True,
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
+        # TODO add something like transformer
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2.act = nn.Identity()
@@ -312,6 +316,7 @@ class Model(nn.Module):
     def forward(self, x, set_to_fc_last=True):
         # Select channels
         x = x[:, :3, :, :]
+        # x = self.preprocessing(x)
         x = self.preprocessing_pingpong_coco(x)
         # assert 0
         N, C, T, V, M = x.size()
@@ -538,10 +543,10 @@ class Model(nn.Module):
         #
         # print('x:', x.shape)
 
-
         features = torch.cat((x, all_list.cuda()), dim=1)
         # print('features:', features.shape)
         return features
+
 
 if __name__ == "__main__":
     # For debugging purposes
