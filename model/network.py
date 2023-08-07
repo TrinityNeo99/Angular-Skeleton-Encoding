@@ -23,6 +23,7 @@ from model.ms_tcn import MultiScale_TemporalConv as MS_TCN
 from model.ms_gtcn import SpatialTemporal_MS_GCN, UnfoldTemporalWindows
 from model.mlp import MLP
 from model.activation import activation_factory
+from model.myTransformer import TransformerEncoder
 
 
 class MS_G3D(nn.Module):
@@ -263,6 +264,8 @@ class Model(nn.Module):
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
         # TODO add something like transformer
+        self.transformer1 = TransformerEncoder(num_layers=3, d_model=c1, num_heads=8, d_ff=c1 * 2)
+
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2.act = nn.Identity()
@@ -321,12 +324,19 @@ class Model(nn.Module):
         # assert 0
         N, C, T, V, M = x.size()
 
+        # N M V C T
         x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
         x = self.data_bn(x)
-        x = x.view(N * M, V, C, T).permute(0, 2, 3, 1).contiguous()
+        x = x.view(N * M, V, C, T).permute(0, 2, 3, 1).contiguous()  # N*M C T V
 
         ###### First Component ######
-        x = self.sgcn1_msgcn(x)
+        x = self.sgcn1_msgcn(x)  # N*M C T V -> N*M C1 T V
+
+        # test transformer: single head attention
+        x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, self.c1)
+        x = self.transformer1(x)
+        x = x.view(N * M, T, V, self.c1).permute(0, 3, 1, 2).contiguous()
+
         x = self.sgcn1_ms_tcn_1(x)
         x = self.sgcn1_ms_tcn_2(x)
         x = self.nonlinear_f(x)
