@@ -1,4 +1,3 @@
-
 work_dir: ./work_dir/pingpong-109-coco/ase_train
 
 # feeder
@@ -35,14 +34,14 @@ model_args:
 # optim
 weight_decay: 0.0005
 base_lr: 0.05
-step: [30,40,50]
+step: [ 30,40,50 ]
 
 # training
 num_epoch: 60
-device: [0,1,2,3,4,5]
-batch_size: 40
-forward_batch_size: 40
-test_batch_size: 80
+device: [ 0,1,2,3,4,5 ]
+batch_size: 6
+forward_batch_size: 6
+test_batch_size: 6
 nesterov: True
 
 # 额外的

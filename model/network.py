@@ -264,7 +264,7 @@ class Model(nn.Module):
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
         # TODO add something like transformer
-        self.transformer1 = TransformerEncoder(num_layers=1, d_model=c1, num_heads=2, d_ff=c1 * 2)
+        self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=1, d_ff=in_channels * 2)
 
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2 = MS_TCN(c1, c1, activation=nonlinear)
@@ -330,12 +330,17 @@ class Model(nn.Module):
         x = x.view(N * M, V, C, T).permute(0, 2, 3, 1).contiguous()  # N*M C T V
 
         ###### First Component ######
+        # Add transformer at start
+        x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, C)  # N*M T*V C
+        x = self.transformer1(x)
+        x = x.view(N * M, T, V, C).permute(0, 3, 1, 2).contiguous()  # N*M C T V
+
         x = self.sgcn1_msgcn(x)  # N*M C T V -> N*M C1 T V
 
-        # test transformer: multi head attention
-        x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, self.c1)
-        x = self.transformer1(x)
-        x = x.view(N * M, T, V, self.c1).permute(0, 3, 1, 2).contiguous()
+        # test transformer: multi-head attention
+        # x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, self.c1)
+        # x = self.transformer1(x)
+        # x = x.view(N * M, T, V, self.c1).permute(0, 3, 1, 2).contiguous()
 
         x = self.sgcn1_ms_tcn_1(x)
         x = self.sgcn1_ms_tcn_2(x)

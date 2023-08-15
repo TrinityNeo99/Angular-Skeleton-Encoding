@@ -30,17 +30,22 @@ class MultiHeadAttention(nn.Module):
         batch_size = query.size(0)
 
         Q = self.query(query).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
+        # B Hn L Hd
         K = self.key(key).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
+        # B Hn L Hd
         V = self.value(value).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
+        # B Hn L Hd
 
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.head_dim)
+        # B Hn L Hd * B Hn Hd L -> B Hn L L
 
         if mask is not None:
             scores = scores.masked_fill(mask == 0, float("-inf"))
 
+        # B Hn L L'
         attention = F.softmax(scores, dim=-1)
-        out = torch.matmul(attention, V)
-        out = out.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
+        out = torch.matmul(attention, V)  # B Hn L L' * B Hn L Hd -> B Hn L Hd
+        out = out.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)  # B L Hn*Hd
         out = self.out(out)
 
         return out
