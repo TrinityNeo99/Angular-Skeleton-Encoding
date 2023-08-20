@@ -264,7 +264,8 @@ class Model(nn.Module):
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
         # TODO add something like transformer
-        self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=1, d_ff=in_channels * 2)
+        self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=4, d_ff=in_channels * 2,
+                                               dropout=0.1)
 
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2 = MS_TCN(c1, c1, activation=nonlinear)
@@ -499,8 +500,8 @@ class Model(nn.Module):
         all_list = [
             fp_sp_joint_list_bone, fp_sp_joint_list_bone_angle,
             fp_sp_two_hand_angle, fp_sp_two_elbow_angle, fp_sp_two_knee_angle,
-            fp_sp_two_feet_angle
-        ]
+            fp_sp_two_feet_angle, fp_sp_two_hand_angle
+        ]  # 3 + 1 + 1 + 1 + 1 + 1
         # print("len of pairs.keys", len(pingpong_coco_bone_angle_pairs.keys()))
         for a_key in pingpong_coco_bone_angle_pairs.keys():
             a_angle_value = pingpong_coco_bone_angle_pairs[a_key]

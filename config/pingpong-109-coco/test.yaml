@@ -9,7 +9,7 @@ test_feeder_args:
 # model
 model: model.network.Model
 model_args:
-  in_channels: 11
+  in_channels: 12
   num_class: 29
   num_point: 17
   num_person: 2
