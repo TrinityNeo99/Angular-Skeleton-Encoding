@@ -37,11 +37,11 @@ base_lr: 0.05
 step: [ 30,40,50 ]
 
 # training
-num_epoch: 80 # org 60
+num_epoch: 120 # org 60
 device: [ 0,1,2,3,4,5 ]
-batch_size: 16
-forward_batch_size: 16
-test_batch_size: 16
+batch_size: 64
+forward_batch_size: 64
+test_batch_size: 64
 nesterov: True
 
 # 额外的

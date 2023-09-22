@@ -332,9 +332,9 @@ class Model(nn.Module):
 
         ###### First Component ######
         # Add transformer at start
-        x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, C)  # N*M T*V C
-        x = self.transformer1(x)
-        x = x.view(N * M, T, V, C).permute(0, 3, 1, 2).contiguous()  # N*M C T V
+        # x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, C)  # N*M T*V C
+        # x = self.transformer1(x)
+        # x = x.view(N * M, T, V, C).permute(0, 3, 1, 2).contiguous()  # N*M C T V
 
         x = self.sgcn1_msgcn(x)  # N*M C T V -> N*M C1 T V
 

@@ -73,8 +73,10 @@ class TransformerEncoderLayer(nn.Module):
                 d_model % num_heads == 0
         ), "Embedding size needs to be divisible by heads"
         self.feed_forward = FeedForward(d_model, d_ff, dropout)
-        self.norm1 = nn.BatchNorm1d(d_model)
-        self.norm2 = nn.BatchNorm1d(d_model)
+        # self.norm1 = nn.BatchNorm1d(d_model)
+        # self.norm2 = nn.BatchNorm1d(d_model)
+        self.norm1 = nn.LayerNorm(d_model)
+        self.norm2 = nn.LayerNorm(d_model)
         self.dropout1 = nn.Dropout(dropout)
         self.dropout2 = nn.Dropout(dropout)
 

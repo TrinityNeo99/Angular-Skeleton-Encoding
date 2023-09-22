@@ -42,6 +42,7 @@ import apex
 
 from utils import count_params, import_class, get_current_time
 
+
 def init_seed(seed):
     torch.cuda.manual_seed_all(seed)
     torch.manual_seed(seed)
@@ -217,7 +218,7 @@ class Processor():
 
             self.print_log(f'Loading weights from {self.arg.weights}')
             if '.pkl' in self.arg.weights:
-                with open(self.arg.weights, 'r') as f:
+                with open(self.arg.weights, 'rb') as f:
                     weights = pickle.load(f)
             else:
                 weights = torch.load(self.arg.weights)
@@ -555,7 +556,7 @@ class Processor():
 
             # 加入one hot
             if self.arg.to_add_onehot:
-                one_hot = torch.eye(self.arg.model_args['num_point']).unsqueeze(1).unsqueeze(-1).unsqueeze(0).\
+                one_hot = torch.eye(self.arg.model_args['num_point']).unsqueeze(1).unsqueeze(-1).unsqueeze(0). \
                     repeat(data.shape[0], 1, data.shape[2], 1, self.arg.model_args['num_person']).to(data.device)
                 data = torch.cat((data, one_hot), dim=1)
 
@@ -751,7 +752,7 @@ class Processor():
                 score_batches = []
                 step = 0
                 # process = tqdm(self.data_loader[ln], dynamic_ncols=True)
-                self.print_log('Eval Epoch: {}, Total Batch: {}'.format(epoch+1, len(self.data_loader[ln])))
+                self.print_log('Eval Epoch: {}, Total Batch: {}'.format(epoch + 1, len(self.data_loader[ln])))
                 for batch_idx, (data, label, index) in enumerate(self.data_loader[ln]):
                     data = data.float().cuda(self.output_device)
                     label = label.long().cuda(self.output_device)
@@ -769,7 +770,7 @@ class Processor():
 
                     # 加入one hot
                     if self.arg.to_add_onehot:
-                        one_hot = torch.eye(self.arg.model_args['num_point']).to(data.device).\
+                        one_hot = torch.eye(self.arg.model_args['num_point']).to(data.device). \
                             unsqueeze(1).unsqueeze(-1).unsqueeze(0). \
                             repeat(data.shape[0], 1, data.shape[2], 1, self.arg.model_args['num_person'])
                         data = torch.cat((data, one_hot), dim=1).to(data.device)
@@ -817,7 +818,6 @@ class Processor():
                             if x != true[i] and wrong_file is not None:
                                 f_w.write(str(index[i].item()) + ',' + str(x) + ',' + str(true[i]) + '\n')
 
-
             if 'is_get_cam' in self.arg.model_args and self.arg.model_args['is_get_cam']:  # To get CAM
                 for a_key in self.cam_dict:  # process cam dictionary
                     self.cam_dict[a_key] = torch.stack(self.cam_dict[a_key])
@@ -825,6 +825,7 @@ class Processor():
 
             score = np.concatenate(score_batches)
             accuracy = self.data_loader[ln].dataset.top_k(score, 1)
+            # TODO output the label
             if accuracy >= self.best_acc:
                 self.best_acc = accuracy
                 self.best_top_5_acc = self.data_loader[ln].dataset.top_k(score, 5)
@@ -854,7 +855,8 @@ class Processor():
             # get confusion matrix
             if self.best_acc_epoch == epoch + 1:
                 if 'ntu' in self.arg.train_feeder_args['data_path'] or \
-                        'test_feeding_data' in self.arg.train_feeder_args['data_path'] and 'ind' not in self.arg.train_feeder_args['data_path'] or \
+                        'test_feeding_data' in self.arg.train_feeder_args['data_path'] and 'ind' not in \
+                        self.arg.train_feeder_args['data_path'] or \
                         'anubis' in self.arg.train_feeder_args['data_path']:
                     acc_dir = os.path.join(self.arg.work_dir, 'accuracy_info')
                     if not os.path.exists(acc_dir):
@@ -888,7 +890,6 @@ class Processor():
         with torch.cuda.device(empty_cache_device):
             torch.cuda.empty_cache()
 
-
     def start(self):
         # self.print_log(f'Model: \n, {self.model}')
 
@@ -901,14 +902,14 @@ class Processor():
                 save_model = (epoch + 1) % 5 == 0
 
                 eval_model = (((epoch + 1) % self.arg.eval_interval == 0) or (epoch + 1 == self.arg.num_epoch)) and \
-                    epoch + 1 >= self.arg.eval_start
+                             epoch + 1 >= self.arg.eval_start
                 self.train(epoch, save_model=save_model, save_training_score=False)
                 # print('eval model: ', self.arg.log_interval)
                 if eval_model:
                     self.eval(epoch, save_score=self.arg.save_score, loader_name=['test'])
                 if self.best_acc_epoch == epoch + 1:
-                    self.save_weights(epoch=f'best_model_{epoch+1}')
-                    self.save_checkpoint(epoch=f'best_model_{epoch+1}')
+                    self.save_weights(epoch=f'best_model_{epoch + 1}')
+                    self.save_checkpoint(epoch=f'best_model_{epoch + 1}')
 
             num_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
             self.print_log(f'Best top-1 accuracy: {self.best_acc}')
@@ -1016,4 +1017,3 @@ if __name__ == '__main__':
     #                'error',
     #                error_msg)
     #     raise RuntimeError('Error caught during running. Report email has been sent. ')
-
