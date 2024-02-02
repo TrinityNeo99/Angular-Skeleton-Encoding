@@ -1,15 +1,26 @@
-work_dir: ./work_dir/ntu/xsub/ase_test
+work_dir: ./work_dir/pingpong-109-coco/ase_train
 
 # feeder
 feeder: feeders.feeder.Feeder
 
+train_feeder_args:
+  data_path: ../dataset/2023-3-29_北体合作_示范动作/MS-G3D/pingpong-109-coco/train_data_joint.npy
+  label_path: ../dataset/2023-3-29_北体合作_示范动作/MS-G3D/pingpong-109-coco/train_label.pkl
+  debug: False
+  random_choose: False
+  random_shift: False
+  random_move: False
+  window_size: -1
+  normalization: False
+
+
 test_feeder_args:
-  data_path: ../dataset/2023-3-29_北体合作_示范动作/MS-G3D/pingpong-109-coco/val_data_joint.npy
-  label_path: ../dataset/2023-3-29_北体合作_示范动作/MS-G3D/pingpong-109-coco/val_label.pkl
+  data_path: ../dataset/in_the_wild_infer_data_generate/MS-G3D/6-6-left/infer_data_joint.npy
+  label_path: ../dataset/in_the_wild_infer_data_generate/MS-G3D/6-6-left/infer_label.pkl
 # model
 model: model.network.Model
 model_args:
-  in_channels: 11
+  in_channels: 12
   num_class: 29
   num_point: 17
   num_person: 2
@@ -38,5 +49,5 @@ eval_start: 5
 eval_interval: 5
 
 phase: test
-weights: ./work_dir/pingpong-109-coco/ase_train/2023-05-21T22-44-20/epoch60_test_score.pkl
+weights: ./work_dir/pingpong-109-coco/ase_train/2023-09-22T15-24-07/weights/weights-epoch-best_model_90.pt
 save_score: True

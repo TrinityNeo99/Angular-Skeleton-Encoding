@@ -1,4 +1,4 @@
-work_dir: ./work_dir/ntu/xsub/ase_test
+work_dir: ./work_dir/pingpong-109-coco/ase_train
 
 # feeder
 feeder: feeders.feeder.Feeder
@@ -38,5 +38,5 @@ eval_start: 5
 eval_interval: 5
 
 phase: test
-weights: ./work_dir/pingpong-109-coco/ase_train/2023-05-21T22-44-20/epoch60_test_score.pkl
+weights: ./work_dir/pingpong-109-coco/ase_train/2023-09-22T15-24-07/weights/weights-epoch-best_model_90.pt
 save_score: True
