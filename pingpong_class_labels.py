@@ -4,7 +4,7 @@
 """
 @Project: 2023-GCN-action-recognize-tutorial
 @FileName: pingpong_class_labels.py
-@Description: 自动描述，请及时修改
+@Description: 数据集类别与数字
 @Author: Wei Jiangning
 @version: 1.0.0a1.0
 @Date: 2023/9/22 17:09 at PyCharm
@@ -40,4 +40,21 @@ pp_labels = {
     26: "反手动作-摆短",
     27: "反手动作-劈长",
     28: "反手动作-防"
+}
+
+pp_star_challenge = {
+    0: "反手-拧",
+    1: "反手-撕",
+    2: "正手-快带",
+    3: "正手-搓",
+    4: "发球-顺侧旋",
+    5: "反手-拨",
+    6: "反手-弹",
+    7: "反手-搓",
+    8: "正手-被动",
+    9: "正手-拉",
+    10: "发球-勾手",
+    11: "正手-挑",
+    12: "反手-拉",
+    13: "反手-被动"
 }

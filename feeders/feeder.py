@@ -1,4 +1,4 @@
-#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  Copyright (c) 2023-2024. IPCRC, Lab. Jiangnig Wei
 #  All rights reserved
 
 import sys
@@ -218,6 +218,10 @@ class Feeder(Dataset):
         if len(the_label.shape) == 1 or the_label.shape[1] == 1:
             rank = score.argsort()
             hit_top_k = [l in rank[i, -top_k:] for i, l in enumerate(self.label)]
+            # 测试输出
+            top_1_label = [rank[i, -1] for i, l in enumerate(self.label)]
+            print(top_1_label)
+            print(self.label)
             return sum(hit_top_k) * 1.0 / len(hit_top_k)
         # label里面包含fine grain的label
         else:

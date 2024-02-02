@@ -41,7 +41,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 import apex
 
 from utils import count_params, import_class, get_current_time
-from pingpong_class_labels import pp_labels
+from pingpong_class_labels import pp_labels, pp_star_challenge
 
 
 def init_seed(seed):
@@ -962,8 +962,8 @@ class Processor():
                 wrong_file=wf,
                 result_file=rf
             )
-            predict_labels_text = [pp_labels[i] for i in predict_labels]
-            predict_labels_top3_text = [[pp_labels[j] for j in i] for i in predict_labels_top3]
+            predict_labels_text = [pp_star_challenge[i] for i in predict_labels]
+            predict_labels_top3_text = [[pp_star_challenge[j] for j in i] for i in predict_labels_top3]
             print(predict_labels_text)
             print(predict_labels_top3_text)
             self.print_log('Done.\n')

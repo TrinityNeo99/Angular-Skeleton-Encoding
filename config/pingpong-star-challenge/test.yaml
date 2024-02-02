@@ -3,6 +3,10 @@ work_dir: ./work_dir/pingpong-109-coco/ase_train
 # feeder
 feeder: feeders.feeder.Feeder
 
+train_feeder_args: # fake train args for running the test
+  data_path: ../dataset/2024-球星挑战赛/pingpong-star-challenge/train_data_joint.npy
+  label_path: ../dataset/2024-球星挑战赛/pingpong-star-challenge/train_label.pkl
+
 test_feeder_args:
   data_path: ../dataset/2024-球星挑战赛/pingpong-star-challenge/val_data_joint.npy
   label_path: ../dataset/2024-球星挑战赛/pingpong-star-challenge/val_label.pkl
@@ -10,7 +14,7 @@ test_feeder_args:
 model: model.network.Model
 model_args:
   in_channels: 12
-  num_class: 29
+  num_class: 14
   num_point: 17
   num_person: 2
   num_gcn_scales: 8
@@ -38,5 +42,5 @@ eval_start: 5
 eval_interval: 5
 
 phase: test
-weights: ./work_dir/pingpong-109-coco/ase_train/2023-09-22T15-24-07/weights/weights-epoch-best_model_90.pt
+weights: ./work_dir/pingpong-star-challenge/ase_train/2024-02-02T19-21-06/weights/weights-epoch-best_model_40.pt
 save_score: True
