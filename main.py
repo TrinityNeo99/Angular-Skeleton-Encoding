@@ -1,4 +1,4 @@
-#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  Copyright (c) 2023-2024. IPCRC, Lab. Jiangnig Wei
 #  All rights reserved
 
 from __future__ import print_function
@@ -41,6 +41,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 import apex
 
 from utils import count_params, import_class, get_current_time
+from pingpong_class_labels import pp_labels
 
 
 def init_seed(seed):
@@ -807,6 +808,7 @@ class Processor():
                     score_batches.append(out_cls.data.cpu().numpy())
 
                     _, predict_label = torch.max(out_cls.data, 1)
+                    _, predict_label_top3 = torch.topk(out_cls.data, k=3, dim=1)
                     step += 1
 
                     if wrong_file is not None or result_file is not None:
@@ -890,6 +892,8 @@ class Processor():
         with torch.cuda.device(empty_cache_device):
             torch.cuda.empty_cache()
 
+        return list(predict_label.cpu().numpy()), list(predict_label_top3.cpu().numpy())
+
     def start(self):
         # self.print_log(f'Model: \n, {self.model}')
 
@@ -951,14 +955,17 @@ class Processor():
             self.print_log(f'Weights: {self.arg.weights}')
 
             self.arg.eval_start = -1
-            self.eval(
+            predict_labels, predict_labels_top3 = self.eval(
                 epoch=0,
                 save_score=self.arg.save_score,
                 loader_name=['test'],
                 wrong_file=wf,
                 result_file=rf
             )
-
+            predict_labels_text = [pp_labels[i] for i in predict_labels]
+            predict_labels_top3_text = [[pp_labels[j] for j in i] for i in predict_labels_top3]
+            print(predict_labels_text)
+            print(predict_labels_top3_text)
             self.print_log('Done.\n')
 
         elif self.arg.phase == 'get_model_features':
