@@ -1,3 +1,6 @@
+#  Copyright (c) 2024. IPCRC, Lab. Jiangnig Wei
+#  All rights reserved
+
 import argparse
 import random
 import os
@@ -75,7 +78,7 @@ def get_parser():
     parser.add_argument(
         '--show-topk',
         type=int,
-        default=[1, 5],
+        default=[1, 3, 5],
         nargs='+',
         help='which Top K accuracy will be shown')
 
