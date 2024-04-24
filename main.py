@@ -939,7 +939,7 @@ class Processor():
                         f'Forward Batch Size: {self.arg.forward_batch_size} <br> ' \
                         f'Test Batch Size: {self.arg.test_batch_size} <br><br> ' \
                         f'沃伦堡瞭望塔 持续为您观察. <br>'
-            send_email(['zhenyue.qin@anu.edu.au'], 'exp_end', email_msg)
+            send_email(['trinity@bupt.edu.cn'], 'exp_end', email_msg)
 
         elif self.arg.phase == 'test':
             self.arg.test_feeder_args['debug'] = False
