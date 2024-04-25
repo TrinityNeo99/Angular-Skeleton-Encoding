@@ -30,7 +30,7 @@ from utils_dir.utils_math import dct_2_no_sum_parallel, gen_dct_on_the_fly
 from utils_dir.utils_result import get_result_confusion_jsons
 from utils_dir.utils_visual import azure_kinect_post_visualize
 
-email_receivers = ['yang.liu3@anu.edu.au']
+email_receivers = ['trinity@bupt.edu.cn']
 
 import numpy as np
 import torch.nn as nn
@@ -42,6 +42,8 @@ import apex
 
 from utils import count_params, import_class, get_current_time
 from pingpong_class_labels import pp_labels, pp_star_challenge
+
+import wandb
 
 
 def init_seed(seed):
@@ -599,6 +601,7 @@ class Processor():
                         loss_rank_pool = loss_rank_pool * self.rank_pool_w
                         loss_total += loss_rank_pool
                         loss_value_dict['rank_pool_loss'].append(loss_rank_pool.item())
+                wandb.log({"train_total_loss": loss_total})
 
                 if self.arg.half:
                     with apex.amp.scale_loss(loss_total, self.optimizer) as scaled_loss:
@@ -672,6 +675,7 @@ class Processor():
         for k in self.arg.show_topk:
             self.print_log(f"\t↦↦↦ Train Top {k}: "
                            f"{100 * np.mean(tr_acc_list):.2f}%")
+            wandb.log({f"train_acc_top_{k}": 100 * np.mean(tr_acc_list)})
 
         self.print_log('\t♬♬♬♬♬ Time consumption: [Data]{dataloader}, [Network]{model}'.format(**proportion))
 
@@ -803,7 +807,7 @@ class Processor():
                             loss_rank_pool = loss_rank_pool * self.rank_pool_w
                             loss_total += self.rank_pool_w * loss_rank_pool
                             loss_value_dict['rank_pool_loss'].append(loss_rank_pool.item())
-
+                    wandb.log({"eval_total_loss": loss_total})
                     loss_value_dict['loss_total'].append(loss_total.item())
                     score_batches.append(out_cls.data.cpu().numpy())
 
@@ -851,8 +855,10 @@ class Processor():
                 prefix_list += '->'
             for k in self.arg.show_topk:
                 self.print_log(f'\t↦↦↦ Eval Top {k}: {100 * self.data_loader[ln].dataset.top_k(score, k):.2f}%')
+                wandb.log({f"eval_acc_top_{k}": 100 * self.data_loader[ln].dataset.top_k(score, k)})
             self.print_log(f'\t↦↦↦ Current Eval Best top-1 accuracy: {100 * self.best_acc:.2f}%')
             self.print_log(f'\t★★★★★ Working dir: {self.arg.work_dir}')
+            wandb.log({"Eval Best top-1 acc": 100 * self.best_acc})
 
             # get confusion matrix
             if self.best_acc_epoch == epoch + 1:
@@ -964,8 +970,8 @@ class Processor():
             )
             predict_labels_text = [pp_star_challenge[i] for i in predict_labels]
             predict_labels_top3_text = [[pp_star_challenge[j] for j in i] for i in predict_labels_top3]
-            print(predict_labels_text)
-            print(predict_labels_top3_text)
+            # print(predict_labels_text)
+            # print(predict_labels_top3_text)
             self.print_log('Done.\n')
 
         elif self.arg.phase == 'get_model_features':
@@ -986,6 +992,17 @@ class Processor():
             self.print_log('Done.\n')
 
 
+def wandb_init(args):
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="sports_action_recognition",
+        # name="ASE_GCN_modified_transformer_at_first_sinPE",
+        name="ASE_GCN_pure_transformer_at_sinPE",
+        # track hyperparameters and run metadata
+        config=args
+    )
+
+
 def main():
     parser = get_parser()
 
@@ -1004,6 +1021,7 @@ def main():
         parser.set_defaults(**default_arg)
 
     arg = parser.parse_args()
+    wandb_init(args=arg)
     # if arg.phase == 'train':
     arg.work_dir = os.path.join(arg.work_dir, get_current_time())
     init_seed(arg.seed)

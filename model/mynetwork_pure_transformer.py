@@ -239,7 +239,7 @@ class SinPositionEncoding(nn.Module):
 
         pe_b = [pe for i in range(self.bach_size)]
         pe_m = torch.stack(pe_b, dim=0)
-        return pe_m.cuda()
+        return torch.tensor(pe_m).cuda()
 
 
 class Model(nn.Module):
@@ -280,7 +280,7 @@ class Model(nn.Module):
         # c2 = c1 * 2  # 192
         # c3 = c2 * 2  # 384
 
-        c1 = 96
+        c1 = 24
         self.c1 = c1
         c2 = c1 * 2  # 192  # Original implementation
         self.c2 = c2
@@ -295,8 +295,11 @@ class Model(nn.Module):
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
 
+        self.feature_embedding = nn.Linear(in_channels, c1)
+
         # TODO add something like transformer
-        self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=4, d_ff=in_channels * 2,
+
+        self.transformer1 = TransformerEncoder(num_layers=1, d_model=c1, num_heads=4, d_ff=in_channels * 2,
                                                dropout=0.1)
 
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
@@ -347,7 +350,7 @@ class Model(nn.Module):
 
         self.to_use_final_fc = to_use_final_fc
         if self.to_use_final_fc:
-            self.fc = nn.Linear(c3, num_class)
+            self.fc = nn.Linear(c1, num_class)
 
     def forward(self, x, set_to_fc_last=True):
         # Select channels
@@ -365,41 +368,14 @@ class Model(nn.Module):
 
         ###### First Component ######
         # Add transformer at start
-        pe = SinPositionEncoding(N * M, T * V, C)  # add batch embedding
-
+        pe = SinPositionEncoding(N * M, T * V, self.c1)  # add batch embedding
         x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, C)  # N*M T*V C
+        x = self.feature_embedding(x)  # N*M T*V c1
         x = x + pe.forward()
-        x = self.transformer1(x)
-        x = x.view(N * M, T, V, C).permute(0, 3, 1, 2).contiguous()  # N*M C T V
-
-        x = self.sgcn1_msgcn(x)  # N*M C T V -> N*M C1 T V
-
-        # test transformer: multi-head attention
-        # x = x.permute(0, 2, 3, 1).contiguous().view(N * M, T * V, self.c1)
-        # x = self.transformer1(x)
-        # x = x.view(N * M, T, V, self.c1).permute(0, 3, 1, 2).contiguous()
-
-        x = self.sgcn1_ms_tcn_1(x)
-        x = self.sgcn1_ms_tcn_2(x)
-        x = self.nonlinear_f(x)
-        x = self.tcn1(x)
-        ###### End First Component ######
-
-        ###### Second Component ######
-        x = self.sgcn2_msgcn(x)
-        x = self.sgcn2_ms_tcn_1(x)
-        x = self.sgcn2_ms_tcn_2(x)
-        x = self.nonlinear_f(x)
-        x = self.tcn2(x)
-        ###### End Second Component ######
-
-        ###### Third Component ######
-        x = self.sgcn3_msgcn(x)
-        x = self.sgcn3_ms_tcn_1(x)
-        x = self.sgcn3_ms_tcn_2(x)
-        x = self.nonlinear_f(x)
-        x = self.tcn3(x)
-        ###### End Third Component ######
+        x = self.transformer1(x) + x  # first transformer + residual
+        # x = self.transformer1(x) + x  # second transformer + residual
+        # x = self.transformer1(x) + x  # second transformer + residual
+        x = x.view(N * M, T, V, self.c1).permute(0, 3, 1, 2).contiguous()  # N*M c1 T V 变回原来GCN的模型的维度
 
         out = x
 
@@ -407,7 +383,7 @@ class Model(nn.Module):
 
         t_dim = out.shape[2]
         out = out.view(N, M, out_channels, t_dim, -1)
-        out = out.permute(0, 1, 3, 4, 2)  # N, M, T, V, C
+        out = out.permute(0, 1, 3, 4, 2)  # N, M, T, V, c1
         out = out.mean(3)  # Global Average Pooling (Spatial)
 
         out = out.mean(2)  # Global Average Pooling (Temporal)

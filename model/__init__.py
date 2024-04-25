@@ -3,3 +3,4 @@
 
 from . import network
 from . import mynetwork
+from . import mynetwork_pure_transformer
