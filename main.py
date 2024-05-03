@@ -909,6 +909,7 @@ class Processor():
             # self.print_log(self.model)
             self.global_step = self.arg.start_epoch * len(self.data_loader['train']) / self.arg.batch_size
             for epoch in range(self.arg.start_epoch, self.arg.num_epoch):
+                wandb.log({"epoch": epoch})
                 save_model = (epoch + 1) % 5 == 0
 
                 eval_model = (((epoch + 1) % self.arg.eval_interval == 0) or (epoch + 1 == self.arg.num_epoch)) and \
@@ -993,10 +994,11 @@ class Processor():
 
 
 def wandb_init(args):
+    wandb.login(key="bc22e6220c728740eef0df1af4695d3bd63ec155", force=True)
     wandb.init(
         # set the wandb project where this run will be logged
         project="sports_action_recognition",
-        # name="ASE_GCN_modified_transformer_at_first_sinPE",
+        # name="ASE_GCN_baseline",
         name="ASE_GCN_pure_transformer_at_sinPE",
         # track hyperparameters and run metadata
         config=args
@@ -1008,7 +1010,7 @@ def main():
 
     # load arg form config file
     p = parser.parse_args()
-    p.num_worker = p.num_worker * 2
+    # p.num_worker = p.num_worker * 2
 
     if p.config is not None:
         with open(p.config, 'r', encoding='utf-8') as f:

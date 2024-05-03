@@ -17,9 +17,9 @@ test_feeder_args:
   label_path: ../dataset/2024-p2a/2s-AGCN+MSG3D-fomat/p2a/v1/val_label.pkl
 
 # model
-#model: model.network.Model
+model: model.network.Model
 #model: model.mynetwork.Model
-model: model.mynetwork_pure_transformer.Model
+#model: model.mynetwork_pure_transformer.Model
 model_args:
   in_channels: 12
   num_class: 14 # the number of categories
@@ -32,6 +32,7 @@ model_args:
   # ablation
   ablation: sgcn_only
 
+num_worker: 30
 
 # optim
 weight_decay: 0.0005
@@ -40,10 +41,10 @@ step: [ 30,40,50 ]
 
 # training
 num_epoch: 60 # org 60
-device: [ 2,3,4,5 ]
-batch_size: 16
-forward_batch_size: 16
-test_batch_size: 16
+device: [ 0,1, 2,3,4,5 ]
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 128
 nesterov: True
 
 # 额外的
@@ -57,4 +58,4 @@ optimizer: SGD
 # resume: True
 
 eval_start: 1
-eval_interval: 5
+eval_interval: 1
