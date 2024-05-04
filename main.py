@@ -2,6 +2,8 @@
 #  All rights reserved
 
 from __future__ import print_function
+
+import sys
 import time
 
 import json
@@ -44,6 +46,9 @@ from utils import count_params, import_class, get_current_time
 from pingpong_class_labels import pp_labels, pp_star_challenge
 
 import wandb
+
+sys.path.append("../")
+from Evaluate.evaluate import generate_confusion_matrix
 
 
 def init_seed(seed):
@@ -876,6 +881,9 @@ class Processor():
                         self.arg.train_feeder_args['data_path'],
                         acc_f_name_prefix
                     )
+                predicted_labels = score.argsort()[:, -1]
+                generate_confusion_matrix(predicted_labels, self.data_loader[ln].dataset.label, dataset="p2a-14",
+                                          output_dir=self.arg.work_dir)
 
             ts_email_msg = 'Incoming transmission ... <br>' \
                            'Current experiment progress: <br>' \

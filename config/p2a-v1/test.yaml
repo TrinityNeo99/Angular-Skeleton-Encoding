@@ -42,5 +42,5 @@ eval_start: 5
 eval_interval: 5
 
 phase: test
-weights: ./work_dir/pingpong-star-challenge/ase_train/2024-02-02T19-21-06/weights/weights-epoch-best_model_40.pt
+weights: ./work_dir/p2a-v1/ase_train/2024-04-19T14-59-12/weights/weights-epoch-best_model_35.pt
 save_score: True
