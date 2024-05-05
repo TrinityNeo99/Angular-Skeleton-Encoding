@@ -1,4 +1,4 @@
-#  Copyright (c) 2023. IPCRC, Lab. Jiangnig Wei
+#  Copyright (c) 2023-2024. IPCRC, Lab. Jiangnig Wei
 #  All rights reserved
 
 import copy
@@ -501,7 +501,7 @@ class Model(nn.Module):
             fp_sp_joint_list_bone, fp_sp_joint_list_bone_angle,
             fp_sp_two_hand_angle, fp_sp_two_elbow_angle, fp_sp_two_knee_angle,
             fp_sp_two_feet_angle, fp_sp_two_hand_angle
-        ]  # 3 + 1 + 1 + 1 + 1 + 1
+        ]  # 3 + 1 + 1 + 1 + 1 + 1 + 1
         # print("len of pairs.keys", len(pingpong_coco_bone_angle_pairs.keys()))
         for a_key in pingpong_coco_bone_angle_pairs.keys():
             a_angle_value = pingpong_coco_bone_angle_pairs[a_key]
@@ -554,6 +554,7 @@ class Model(nn.Module):
             # print(all_list[a_list_id].shape)
 
         # print("a_key: ", a_key)
+        c = all_list
         all_list = torch.cat(all_list, dim=1)
         # print('All_list:', all_list.shape)
         #
