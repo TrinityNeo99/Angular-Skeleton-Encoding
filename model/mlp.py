@@ -1,3 +1,6 @@
+#  Copyright (c) 2024. IPCRC, Lab. Jiangnig Wei
+#  All rights reserved
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,7 +10,7 @@ from utils_dir.utils_visual import plot_multiple_lines
 
 
 class MLP(nn.Module):
-    def __init__(self, in_channels, out_channels, activation='relu', dropout=0):
+    def, __init__(self, in_channels, out_channels, activation='relu', dropout=0):
         super().__init__()
         channels = [in_channels] + out_channels
         self.layers = nn.ModuleList()
