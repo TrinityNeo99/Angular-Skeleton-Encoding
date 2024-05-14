@@ -40,7 +40,7 @@ import torch.optim as optim
 # from torch.utils.tensorboard import SummaryWriter
 from tensorboardX import SummaryWriter
 from torch.optim.lr_scheduler import MultiStepLR
-import apex
+# import apex
 
 from utils import count_params, import_class, get_current_time
 from pingpong_class_labels import pp_labels, pp_star_challenge
@@ -606,7 +606,6 @@ class Processor():
                         loss_rank_pool = loss_rank_pool * self.rank_pool_w
                         loss_total += loss_rank_pool
                         loss_value_dict['rank_pool_loss'].append(loss_rank_pool.item())
-                wandb.log({"train_total_loss": loss_total})
 
                 if self.arg.half:
                     with apex.amp.scale_loss(loss_total, self.optimizer) as scaled_loss:
@@ -654,6 +653,8 @@ class Processor():
             # https://discuss.pytorch.org/t/gpu-memory-consumption-increases-while-training/2770/3
             del cls_out, other_outs
             del loss_cls_ce
+
+            wandb.log({"train_total_loss": np.mean(loss_value_dict['loss_cls_ce']), "epoch": epoch})
 
         # training out scores
         tr_score = np.concatenate(tr_score_batches)
@@ -812,7 +813,7 @@ class Processor():
                             loss_rank_pool = loss_rank_pool * self.rank_pool_w
                             loss_total += self.rank_pool_w * loss_rank_pool
                             loss_value_dict['rank_pool_loss'].append(loss_rank_pool.item())
-                    wandb.log({"eval_total_loss": loss_total})
+
                     loss_value_dict['loss_total'].append(loss_total.item())
                     score_batches.append(out_cls.data.cpu().numpy())
 
@@ -860,10 +861,11 @@ class Processor():
                 prefix_list += '->'
             for k in self.arg.show_topk:
                 self.print_log(f'\t↦↦↦ Eval Top {k}: {100 * self.data_loader[ln].dataset.top_k(score, k):.2f}%')
-                wandb.log({f"eval_acc_top_{k}": 100 * self.data_loader[ln].dataset.top_k(score, k)})
+                wandb.log({f"eval_acc_top_{k}": 100 * self.data_loader[ln].dataset.top_k(score, k), "epoch": epoch})
             self.print_log(f'\t↦↦↦ Current Eval Best top-1 accuracy: {100 * self.best_acc:.2f}%')
             self.print_log(f'\t★★★★★ Working dir: {self.arg.work_dir}')
-            wandb.log({"Eval Best top-1 acc": 100 * self.best_acc})
+            wandb.log({"Eval Best top-1 acc": 100 * self.best_acc, "epoch": epoch})
+            wandb.log({"eval_total_loss": np.mean(loss_value_dict['loss_total']), "epoch": epoch})
 
             # get confusion matrix
             if self.best_acc_epoch == epoch + 1:
@@ -1007,7 +1009,7 @@ def wandb_init(args):
         # set the wandb project where this run will be logged
         project="sports_action_recognition",
         # name="ASE_GCN_baseline",
-        name="ASE_GCN_pure_transformer_at_sinPE",
+        name="ASE_GCN_baseline_15c",
         # track hyperparameters and run metadata
         config=args
     )

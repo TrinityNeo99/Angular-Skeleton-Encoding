@@ -254,5 +254,6 @@ def get_parser():
         '--encoding_args',
         default=dict(),
     )
+    parser.add_argument('--dataset', default="p2a-14")
 
     return parser
