@@ -264,8 +264,8 @@ class Model(nn.Module):
                                   **kwargs, temporal_len=frame_len, fea_dim=c1, to_use_hyper_conv=True,
                                   activation=nonlinear)
         # TODO add something like transformer
-        self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=4, d_ff=in_channels * 2,
-                                               dropout=0.1)
+        # self.transformer1 = TransformerEncoder(num_layers=1, d_model=in_channels, num_heads=4, d_ff=in_channels * 2,
+        #                                        dropout=0.1)
 
         self.sgcn1_ms_tcn_1 = MS_TCN(c1, c1, activation=nonlinear)
         self.sgcn1_ms_tcn_2 = MS_TCN(c1, c1, activation=nonlinear)
@@ -320,8 +320,7 @@ class Model(nn.Module):
     def forward(self, x, set_to_fc_last=True):
         # Select channels
         x = x[:, :3, :, :]
-        # x = self.preprocessing(x)
-        x = self.preprocessing_pingpong_coco(x)
+        x = self.preprocessing(x)
         # assert 0
         N, C, T, V, M = x.size()
 
