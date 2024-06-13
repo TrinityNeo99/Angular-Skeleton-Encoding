@@ -320,7 +320,8 @@ class Model(nn.Module):
     def forward(self, x, set_to_fc_last=True):
         # Select channels
         x = x[:, :3, :, :]
-        x = self.preprocessing(x)
+        # x = self.preprocessing(x)
+        x = self.preprocessing_pingpong_coco(x)
         # assert 0
         N, C, T, V, M = x.size()
 
