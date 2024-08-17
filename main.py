@@ -884,7 +884,8 @@ class Processor():
                         acc_f_name_prefix
                     )
                 predicted_labels = score.argsort()[:, -1]
-                generate_confusion_matrix(predicted_labels, self.data_loader[ln].dataset.label, dataset="p2a-14",
+                generate_confusion_matrix(predicted_labels, self.data_loader[ln].dataset.label,
+                                          dataset=self.arg.dataset,
                                           output_dir=self.arg.work_dir)
 
             ts_email_msg = 'Incoming transmission ... <br>' \
@@ -1004,7 +1005,7 @@ class Processor():
 
 
 def wandb_init(args):
-    wandb.login(key="bc22e6220c728740eef0df1af4695d3bd63ec155", force=True)
+    wandb.login(key="610ea58ece04cbfb08fe53c2d852fccf1833d910", force=True)
     wandb.init(
         # set the wandb project where this run will be logged
         project="sports_action_recognition",
