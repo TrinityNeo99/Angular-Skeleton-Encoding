@@ -933,6 +933,8 @@ class Processor():
                     self.save_weights(epoch=f'best_model_{epoch + 1}')
                     self.save_checkpoint(epoch=f'best_model_{epoch + 1}')
 
+            # TODO secondary model
+
             num_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
             self.print_log(f'Best top-1 accuracy: {self.best_acc}')
             self.print_log(f'Best top-5 accuracy: {self.best_top_5_acc}')

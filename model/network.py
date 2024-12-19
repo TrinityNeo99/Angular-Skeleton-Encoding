@@ -319,11 +319,19 @@ class Model(nn.Module):
 
     def forward(self, x, set_to_fc_last=True):
         # Select channels
-        x = x[:, :3, :, :]
+        org_x = x
+        x = x[:, :3, :, :, :]
         # x = self.preprocessing(x)
         x = self.preprocessing_pingpong_coco(x)
+        if org_x.shape[1] == 4:
+            # print("extra_info")
+            x = torch.cat((x, org_x[:, 3, :, :, :].unsqueeze(1)), dim=1)
+            # print(x.shape)
+        elif org_x.shape[1] > 4:
+            x = torch.cat((x, org_x[:, 3:, :, :, :]), dim=1)
         # assert 0
         N, C, T, V, M = x.size()
+        # print("the final shape is: ", x.shape)
 
         # N M V C T
         x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
@@ -560,7 +568,7 @@ class Model(nn.Module):
         #
         # print('x:', x.shape)
 
-        features = torch.cat((x, all_list.cuda()), dim=1)
+        features = torch.cat((x, all_list.to(x.device)), dim=1)
         # print('features:', features.shape)
         return features
 
